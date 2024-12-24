@@ -35,7 +35,7 @@ class KeyAttestation {
 				.build()
 		)
 
-		var keyPair = kpg.generateKeyPair()
+		kpg.generateKeyPair()
 	}
 
 	fun getCertificateChain() : ByteArray {

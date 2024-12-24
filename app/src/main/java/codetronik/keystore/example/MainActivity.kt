@@ -32,11 +32,17 @@ class MainActivity : AppCompatActivity() {
 
 		// 서버에서 받아온 챌린지 설정
 		keyAttestation.generateSignKeyPair(challenge.encodeToByteArray())
-		var certChain = keyAttestation.getCertificateChain()
 
-		// 서버에서 인증서 검증
-		if(!srv.verifyCertChain(certChain)) {
+		// 인증서 변환 (raw to 인증서 배열)
+		var certList = srv.convertCertChain(keyAttestation.getCertificateChain())
+
+		// 서버에서 챌린지 및 인증서 검증
+		if(!srv.verifyCertChain(certList)) {
 			println("Certificate verification failure")
+		}
+
+		if (!srv.isTrustedDevice(certList.first())) {
+			println("Untrusted Device")
 		}
 	}
 
