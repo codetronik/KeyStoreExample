@@ -1,6 +1,5 @@
 package codetronik.keystore.example
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.security.keystore.KeyGenParameterSpec
@@ -17,8 +16,6 @@ import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.PublicKey
 import java.security.SecureRandom
-import java.security.cert.Certificate
-import java.security.cert.X509Certificate
 import java.security.spec.MGF1ParameterSpec
 import java.util.Arrays
 import javax.crypto.Cipher

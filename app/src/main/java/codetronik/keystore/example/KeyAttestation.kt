@@ -7,7 +7,6 @@ import android.security.keystore.KeyProperties
 import java.security.KeyPairGenerator
 import java.security.KeyStore
 
-
 class KeyAttestation {
 	private val SIGN_KEY_ALIAS = "SIGN_KEY_ALIAS"
 

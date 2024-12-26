@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 
 	fun certTest() {
 		// 서버에서 챌린지 받아옴
-		val srv = VerifyServer()
+		val srv = Verifier()
 		val challenge = srv.createChallenge(5)
 
 		val keyAttestation = KeyAttestation()
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 		keyAttestation.generateSignKeyPair(challenge.encodeToByteArray())
 
 		// 인증서 변환 (raw to 인증서 배열)
-		var certList = srv.convertCertChain(keyAttestation.getCertificateChain())
+		val certList = srv.convertCertChain(keyAttestation.getCertificateChain())
 
 		// 서버에서 챌린지 및 인증서 검증
 		if(!srv.verifyCertChain(certList)) {
