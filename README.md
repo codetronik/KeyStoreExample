@@ -1,6 +1,6 @@
 ## Features
 - Wrap Key : https://github.com/codetronik/KeyStoreExample/wiki/Wrap-Key
-- Key Attestation (including Virtual Verification Server)
+- Device Attestation (Server : https://github.com/codetronik/DeviceAttestationServer)
 
 ## Reference
 - https://developer.android.com/privacy-and-security/security-key-attestation
