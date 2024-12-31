@@ -36,7 +36,10 @@ android {
 }
 
 dependencies {
-	implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
+	implementation(libs.okhttp)
+	implementation(libs.kotlinx.coroutines.core)
+	implementation(libs.kotlinx.coroutines.android)
+	implementation(libs.bcpkix.jdk15on)
 	implementation(libs.androidx.core.ktx)
 	implementation(libs.androidx.appcompat)
 	implementation(libs.material)

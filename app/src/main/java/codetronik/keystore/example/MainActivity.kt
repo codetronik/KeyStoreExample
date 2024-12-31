@@ -5,44 +5,87 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import kotlinx.coroutines.*
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge()
 		setContentView(R.layout.activity_main)
+
 		ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
 			val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 			v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
 			insets
 		}
 
-		wrapKeyTest("key1_alias")
-		wrapKeyTest("key2_alias")
+		//wrapKeyTest("key1_alias")
+		//wrapKeyTest("key2_alias")
 		certTest()
 	}
 
+	@OptIn(DelicateCoroutinesApi::class)
 	fun certTest() {
-		// 서버에서 챌린지 받아옴
-		val srv = Verifier()
-		val challenge = srv.createChallenge(5)
-
 		val keyAttestation = KeyAttestation()
 		keyAttestation.init(this)
 
-		// 서버에서 받아온 챌린지 설정
-		keyAttestation.generateSignKeyPair(challenge.encodeToByteArray())
+		GlobalScope.launch(Dispatchers.IO) {
+			val challenge = httpRequest( "http://10.90.226.104:8080/getChallange", null, "GET")
+			if (challenge == null) {
+				println("Failed to get a response.")
+				return@launch // 스코프 밖으로 이동
+			}
+			println("Response from server: $challenge")
 
-		// 인증서 변환 (raw to 인증서 배열)
-		val certList = srv.convertCertChain(keyAttestation.getCertificateChain())
+			// 서버에서 받아온 챌린지 설정
+			keyAttestation.generateSignKeyPair(challenge.encodeToByteArray())
 
-		// 서버에서 챌린지 및 인증서 검증
-		if(!srv.verifyCertChain(certList)) {
-			println("Certificate verification failure")
+			val certChain = keyAttestation.getCertificateChain()
+
+			val response = httpRequest( "http://10.90.226.104:8080/sendCertChain", """{"certChain": "$certChain"}""", "POST")
+			if (response == null) {
+				println("Failed to get a response.")
+			}
+
+			launch(Dispatchers.Main) {
+				// IO 스레드 실행 후 처리 코드
+			}
+		}
+	}
+
+	fun httpRequest(url: String, json: String?, method: String): String? {
+		val requestBody: RequestBody? = json?.toRequestBody("application/json; charset=utf-8".toMediaType())
+		val requestBuilder = Request.Builder().url(url)
+
+		if (method == "POST") {
+			requestBuilder.post(requestBody!!)
+		} else if (method == "GET") {
+			requestBuilder.get()
 		}
 
-		if (!srv.isTrustedDevice(certList.first())) {
-			println("Untrusted Device")
+		val request = requestBuilder.build()
+		val client = OkHttpClient.Builder()
+			.connectTimeout(30, TimeUnit.SECONDS)
+			.readTimeout(60, TimeUnit.SECONDS)
+			.writeTimeout(60, TimeUnit.SECONDS)
+			.build()
+
+		try {
+			val response = client.newCall(request).execute()
+
+			if (response.isSuccessful) {
+				return response.body?.string()
+			} else {
+				println("Request failed with status code: ${response.code}")
+				return null
+			}
+		} catch (e: Exception) {
+			println("Request failed: ${e.message}")
+			return null
 		}
 	}
 

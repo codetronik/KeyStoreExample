@@ -37,12 +37,13 @@ class KeyAttestation {
 		kpg.generateKeyPair()
 	}
 
-	fun getCertificateChain() : ByteArray {
+	@OptIn(ExperimentalStdlibApi::class)
+	fun getCertificateChain() : String {
 		val certificateChain = keyStore.getCertificateChain(SIGN_KEY_ALIAS)
 
 		// 인증서 체인을 하나의 ByteArray로 합침
 		return certificateChain.flatMap { certificate ->
 			certificate.encoded.toList()
-		}.toByteArray()
+		}.toByteArray().toHexString(0)
 	}
 }
