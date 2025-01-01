@@ -23,8 +23,8 @@ class MainActivity : AppCompatActivity() {
 			insets
 		}
 
-		//wrapKeyTest("key1_alias")
-		//wrapKeyTest("key2_alias")
+		wrapKeyTest("key1_alias")
+		wrapKeyTest("key2_alias")
 		certTest()
 	}
 
