@@ -1,4 +1,4 @@
-name: Android Build (Debug APK)
+name: Android Build with SonarCloud
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build Debug APK
+    name: Build Debug APK & Analyze with SonarCloud
     runs-on: ubuntu-latest
 
     steps:
@@ -28,6 +28,16 @@ jobs:
     - name: Grant execute permission for Gradle
       run: chmod +x ./gradlew
 
+    - name: Run SonarCloud analysis
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        ./gradlew sonar \
+          -Dsonar.projectKey=codetronik_KeyStoreExample \
+          -Dsonar.organization=codetronik \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.login=${SONAR_TOKEN}
+          
     - name: Build Debug APK
       run: ./gradlew assembleDebug
 
